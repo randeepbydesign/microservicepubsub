@@ -52,3 +52,5 @@ be the case with all messaging solutions.
 - Vendor lock-in
 - For local development and testing there is a dependency on AWS. This can be mitigated with use of a 
 library like LocalStack
+- Subscriptions to a topic are configured at the SNS level. A user creating a queue will need to be able to 
+access the SNS service as a result to create a subscription.
