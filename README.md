@@ -54,3 +54,4 @@ be the case with all messaging solutions.
 library like LocalStack
 - Subscriptions to a topic are configured at the SNS level. A user creating a queue will need to be able to 
 access the SNS service as a result to create a subscription.
+- FIFO Queues are not compatible with SNS, so sequential processing is not possible.
