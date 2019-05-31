@@ -8,14 +8,15 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sns.model.Topic;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 import java.util.stream.Collectors;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
 
-public class SnsPublisher {
+public class SnsPublisher implements Publisher {
 
-    private static final Logger log = Logger.getAnonymousLogger();
+    private static final Logger log = LoggerFactory.getLogger(SnsPublisher.class);
 
     final private AmazonSNS publisher;
     final private String topicName;
@@ -27,6 +28,7 @@ public class SnsPublisher {
         this.topicName = topicName;
     }
 
+    @Override
     public String publish(final String subject, final String messageBody) {
         PublishRequest publishRequest = new PublishRequest();
         publishRequest

@@ -2,7 +2,9 @@ package com.randeepbydesign.pubsub;
 
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import java.util.logging.Logger;
+import com.randeepbydesign.pubsub.impl.PrintlnProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single class that can be used to run:
@@ -22,7 +24,7 @@ public class Orchestra {
 
     private static int counter = 0;
 
-    private static final Logger log = Logger.getAnonymousLogger(null);
+    private static final Logger log = LoggerFactory.getLogger(Orchestra.class);
 
     public static void main(String[] args) {
         if (args.length < 3) {
@@ -45,12 +47,13 @@ public class Orchestra {
         }
 
         SqsConsumer consumer = new SqsConsumer(AmazonSQSClientBuilder.defaultClient(), sqsName, (message -> {
-            if (!message.getBody().contains("Poison pill")) {
+            String messageBody = message.getMessage().toString();
+            if (!messageBody.contains("Poison pill")) {
                 System.out
-                        .println("simulate successful processing of " + message.getBody().replace('\n', ' '));
-                return message.getReceiptHandle();
+                        .println("simulate successful processing of " + messageBody.replace('\n', ' '));
+                return message.getMessageId();
             }
-            log.warning("Simulating processing failure at 5% rate for " + message.getBody());
+            log.warn("Simulating processing failure at 5% rate for " + messageBody);
             throw new RuntimeException("Poisoned message, cannot process");
         }));
         SqsConsumer dlqConsumer = new SqsConsumer(AmazonSQSClientBuilder.defaultClient(), dlqName,

@@ -1,7 +1,5 @@
 package com.randeepbydesign.pubsub;
 
-import com.amazonaws.services.sqs.model.Message;
-
 /**
  * Generic interface that can be used to process messages. Would probably want to setup something
  * specific for handling the JSON envelopes we are dealing with to extract the actual message and any

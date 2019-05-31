@@ -13,12 +13,30 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
     <dependencies>
-      <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.26</version>
+      </dependency>
+
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk</artifactId>
         <version>1.11.510</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>amazon-kinesis-producer</artifactId>
+        <version>0.12.11</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>amazon-kinesis-client</artifactId>
+        <version>1.7.5</version>
+      </dependency>
+
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
