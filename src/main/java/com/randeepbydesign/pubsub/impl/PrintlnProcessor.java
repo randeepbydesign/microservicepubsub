@@ -13,7 +13,7 @@ public class PrintlnProcessor implements MessageProcessor {
 
     @Override
     public String processMessage(com.randeepbydesign.pubsub.Message message) {
-        System.out.println("Parsing message:\n\t" + message.getMessage().toString());
+        log.info("Parsing message:\n\t" + message.getMessage());
         return message.getMessageId();
     }
 

@@ -1,4 +1,4 @@
-package com.randeepbydesign.pubsub;
+package com.randeepbydesign.pubsub.sqssns;
 
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
@@ -7,14 +7,18 @@ import com.amazonaws.services.sns.model.ListTopicsResult;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sns.model.Topic;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.randeepbydesign.pubsub.JsonPublisher;
+import com.randeepbydesign.pubsub.Publisher;
+import com.randeepbydesign.pubsub.domain.Bottle;
 import java.util.List;
-import org.slf4j.Logger;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
 
-public class SnsPublisher implements Publisher {
+public class SnsPublisher extends JsonPublisher {
 
     private static final Logger log = LoggerFactory.getLogger(SnsPublisher.class);
 
@@ -24,6 +28,7 @@ public class SnsPublisher implements Publisher {
     private Topic topic = null;
 
     public SnsPublisher(AmazonSNS publisher, String topicName) {
+        super(new ObjectMapper());
         this.publisher = publisher;
         this.topicName = topicName;
     }
@@ -31,8 +36,7 @@ public class SnsPublisher implements Publisher {
     @Override
     public String publish(final String subject, final String messageBody) {
         PublishRequest publishRequest = new PublishRequest();
-        publishRequest
-                .setMessage(messageBody);
+        publishRequest.setMessage(messageBody);
         publishRequest.setSubject(subject);
         publishRequest.setTopicArn(getTopic().getTopicArn());
 
@@ -84,6 +88,9 @@ public class SnsPublisher implements Publisher {
     }
 
     public static void main(String[] args) {
+        if(args.length<=0) {
+            throw new RuntimeException("Missing SNS topic name param");
+        }
         SnsPublisher publisher = new SnsPublisher(AmazonSNSClientBuilder.defaultClient(), args[0]);
         int counter = 0;
 
@@ -95,8 +102,18 @@ public class SnsPublisher implements Publisher {
             } catch (InterruptedException e) {
                 System.err.println("Thread sleep interrupted: " + e.getLocalizedMessage());
             }
-            publisher.publish(args[0] + " event",
-                    Math.random() > .1d ? "Publishing event " + counter++ : "Poison pill " + counter++);
+
+            Bottle b = new Bottle();
+            b.setEmpty(false);
+            b.setFluidOunces((int) (Math.random() * 100));
+            b.setLabel("TestBottle " + counter++);
+            b.setPoison(Math.random() < .1d);
+
+            publisher.publishObject(args[0] + " event", b);
+        }
+
+        if (args.length <= 0) {
+            throw new RuntimeException("Missing SNS topic name param");
         }
     }
 }

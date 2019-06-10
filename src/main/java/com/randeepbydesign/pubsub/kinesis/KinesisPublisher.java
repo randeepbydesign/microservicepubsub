@@ -7,11 +7,13 @@ import com.amazonaws.services.kinesis.producer.UserRecordResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.randeepbydesign.pubsub.JsonPublisher;
 import com.randeepbydesign.pubsub.Message;
 import com.randeepbydesign.pubsub.Publisher;
+import com.randeepbydesign.pubsub.domain.Bottle;
 import java.nio.ByteBuffer;
 
-public class KinesisPublisher implements Publisher {
+public class KinesisPublisher extends JsonPublisher {
 
     private final ObjectMapper objectMapper;
 
@@ -27,6 +29,7 @@ public class KinesisPublisher implements Publisher {
      * to setup JSON data for our purposes
      */
     public KinesisPublisher(KinesisProducer publisher, String streamName, ObjectMapper objectMapper) {
+        super(objectMapper);
         this.publisher = publisher;
         this.streamName = streamName;
         this.objectMapper = objectMapper;
@@ -70,7 +73,7 @@ public class KinesisPublisher implements Publisher {
             kConfig.setRegion(args[1]);
         }
         KinesisProducer kinesisProducer = new KinesisProducer(kConfig);
-        KinesisPublisher publisher = new KinesisPublisher(kinesisProducer, args[0], new ObjectMapper());
+        Publisher publisher = new KinesisPublisher(kinesisProducer, args[0], new ObjectMapper());
         int counter = 0;
 
         while (counter < 100) {
@@ -81,8 +84,12 @@ public class KinesisPublisher implements Publisher {
             } catch (InterruptedException e) {
                 System.err.println("Thread sleep interrupted: " + e.getLocalizedMessage());
             }
-            System.out.println("Message published at " + publisher.publish(args[0] + " event",
-                    Math.random() > .1d ? "Publishing event " + counter++ : "Poison pill " + counter++));
+            Bottle b = new Bottle();
+            b.setEmpty(false);
+            b.setFluidOunces((int) (Math.random() * 100));
+            b.setLabel("TestBottle " + counter++);
+            b.setPoison(Math.random() < .1d);
+            System.out.println("Message published at " + publisher.publishObject(args[0] + " event", b));
         }
     }
 }

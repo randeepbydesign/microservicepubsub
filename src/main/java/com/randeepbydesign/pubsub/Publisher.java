@@ -9,4 +9,6 @@ public interface Publisher {
      * @return an implementation-specific identifier for the published messaage
      */
     String publish(final String subject, final String messageBody);
+
+    String publishObject(final String subject, final Object message);
 }
